@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(cd C:\\\\Users\\\\leeaa\\\\How-Clean-Is-The-626:*)",
+      "WebSearch",
+      "WebFetch(domain:data.lacounty.gov)"
+    ]
+  }
+}
