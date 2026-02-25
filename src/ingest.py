@@ -18,7 +18,7 @@ from typing import Any
 RAW_DIR = Path("data/raw")
 TIMEOUT_SECS = 120
 
-# ArcGIS Online "item data" endpoint streams the file for public CSV items. :contentReference[oaicite:1]{index=1}
+# ArcGIS Online "item data" endpoint streams the file for public CSV items. :contentReference[oacute:1]{index=1}
 ARCGIS_ITEM_DATA_BASE = "https://lacounty.maps.arcgis.com/sharing/rest/content/items"
 
 DATASETS: list[dict[str, str]] = [
