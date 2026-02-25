@@ -1,4 +1,4 @@
-.PHONY: ingest filter_626 stage core
+.PHONY: ingest filter_626 stage core marts
 
 ingest:
 	python -m src.ingest
@@ -11,3 +11,6 @@ stage:
 
 core:
 	python -m src.core
+
+marts:
+	python -m src.marts
