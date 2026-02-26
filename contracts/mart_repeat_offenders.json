@@ -1,0 +1,30 @@
+{
+  "table": "mart_repeat_offenders",
+  "path": "data/processed/mart_repeat_offenders.parquet",
+  "columns": [
+    {"name": "facility_key",              "type": "VARCHAR", "not_null": true},
+    {"name": "facility_name",             "type": "VARCHAR", "not_null": false},
+    {"name": "facility_address",          "type": "VARCHAR", "not_null": false},
+    {"name": "facility_city",             "type": "VARCHAR", "not_null": false},
+    {"name": "facility_state",            "type": "VARCHAR", "not_null": false},
+    {"name": "facility_zip5",             "type": "VARCHAR", "not_null": false},
+    {"name": "facility_id",               "type": "VARCHAR", "not_null": false},
+    {"name": "owner_name",                "type": "VARCHAR", "not_null": false},
+    {"name": "latest_activity_date",      "type": "DATE",    "not_null": false},
+    {"name": "latest_score",              "type": "INTEGER", "not_null": false},
+    {"name": "latest_grade",              "type": "VARCHAR", "not_null": false},
+    {"name": "inspections_12mo",          "type": "BIGINT",  "not_null": true},
+    {"name": "inspections_24mo",          "type": "BIGINT",  "not_null": true},
+    {"name": "inspections_in_window",     "type": "BIGINT",  "not_null": true},
+    {"name": "bad_event_count",           "type": "DOUBLE",  "not_null": true},
+    {"name": "violation_count",           "type": "DOUBLE",  "not_null": true},
+    {"name": "total_points",              "type": "DOUBLE",  "not_null": true},
+    {"name": "violations_per_inspection", "type": "DOUBLE",  "not_null": true},
+    {"name": "points_per_inspection",     "type": "DOUBLE",  "not_null": true},
+    {"name": "score_trend",               "type": "DOUBLE",  "not_null": false},
+    {"name": "violation_score",           "type": "DOUBLE",  "not_null": false},
+    {"name": "event_score",               "type": "DECIMAL", "not_null": false},
+    {"name": "cleanliness_index",         "type": "DOUBLE",  "not_null": true},
+    {"name": "low_data_flag",             "type": "BOOLEAN", "not_null": true}
+  ]
+}

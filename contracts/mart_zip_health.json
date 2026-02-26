@@ -1,0 +1,18 @@
+{
+  "table": "mart_zip_health",
+  "path": "data/processed/mart_zip_health.parquet",
+  "columns": [
+    {"name": "facility_zip5",          "type": "VARCHAR", "not_null": true},
+    {"name": "facility_count",         "type": "BIGINT",  "not_null": true},
+    {"name": "avg_cleanliness_index",  "type": "DOUBLE",  "not_null": false},
+    {"name": "min_cleanliness_index",  "type": "DOUBLE",  "not_null": false},
+    {"name": "max_cleanliness_index",  "type": "DOUBLE",  "not_null": false},
+    {"name": "grade_a_pct",            "type": "DOUBLE",  "not_null": false},
+    {"name": "grade_b_pct",            "type": "DOUBLE",  "not_null": false},
+    {"name": "grade_c_pct",            "type": "DOUBLE",  "not_null": false},
+    {"name": "grade_null_pct",         "type": "DOUBLE",  "not_null": false},
+    {"name": "excellent_count",        "type": "BIGINT",  "not_null": true},
+    {"name": "good_count",             "type": "BIGINT",  "not_null": true},
+    {"name": "poor_count",             "type": "BIGINT",  "not_null": true}
+  ]
+}
