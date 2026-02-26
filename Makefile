@@ -1,4 +1,4 @@
-.PHONY: ingest filter_626 stage core marts validate test
+.PHONY: ingest filter_626 stage core marts validate test geo_near_me
 
 ingest:
 	python -m src.ingest
@@ -17,6 +17,9 @@ marts:
 
 validate:
 	python -m src.validate
+
+geo_near_me:
+	python -m src.geo_near_me
 
 test:
 	python -m pytest tests/test_quality.py -v
