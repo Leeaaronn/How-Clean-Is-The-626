@@ -1,0 +1,2 @@
+zip,method,neighbors,source_note
+91736,mean_neighbors,"91731|91732|91733","derived override: ZIP missing from ZCTA+GeoNames; centroid = mean of neighbor ZIP centroids"
