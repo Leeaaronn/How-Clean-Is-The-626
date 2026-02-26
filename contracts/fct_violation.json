@@ -1,0 +1,13 @@
+{
+  "table": "fct_violation",
+  "path": "data/processed/fct_violation.parquet",
+  "columns": [
+    {"name": "violation_key",        "type": "VARCHAR", "not_null": true},
+    {"name": "serial_number",        "type": "VARCHAR", "not_null": true},
+    {"name": "facility_key",         "type": "VARCHAR", "not_null": true},
+    {"name": "violation_status",     "type": "VARCHAR", "not_null": false},
+    {"name": "violation_code",       "type": "VARCHAR", "not_null": false},
+    {"name": "violation_description","type": "VARCHAR", "not_null": false},
+    {"name": "points",               "type": "DOUBLE",  "not_null": false}
+  ]
+}

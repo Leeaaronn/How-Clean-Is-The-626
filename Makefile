@@ -1,4 +1,4 @@
-.PHONY: ingest filter_626 stage core marts
+.PHONY: ingest filter_626 stage core marts validate test
 
 ingest:
 	python -m src.ingest
@@ -14,3 +14,9 @@ core:
 
 marts:
 	python -m src.marts
+
+validate:
+	python -m src.validate
+
+test:
+	python -m pytest tests/test_quality.py -v

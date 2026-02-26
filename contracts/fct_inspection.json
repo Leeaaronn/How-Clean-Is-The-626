@@ -1,0 +1,27 @@
+{
+  "table": "fct_inspection",
+  "path": "data/processed/fct_inspection.parquet",
+  "columns": [
+    {"name": "serial_number",      "type": "VARCHAR",  "not_null": true},
+    {"name": "facility_key",       "type": "VARCHAR",  "not_null": true},
+    {"name": "activity_date",      "type": "DATE",     "not_null": true},
+    {"name": "score",              "type": "INTEGER",  "not_null": false},
+    {"name": "grade",              "type": "VARCHAR",  "not_null": false},
+    {"name": "facility_id",        "type": "VARCHAR",  "not_null": false},
+    {"name": "facility_name",      "type": "VARCHAR",  "not_null": false},
+    {"name": "facility_address",   "type": "VARCHAR",  "not_null": false},
+    {"name": "facility_city",      "type": "VARCHAR",  "not_null": false},
+    {"name": "facility_state",     "type": "VARCHAR",  "not_null": false},
+    {"name": "facility_zip5",      "type": "VARCHAR",  "not_null": false},
+    {"name": "service_code",       "type": "VARCHAR",  "not_null": false},
+    {"name": "service_description","type": "VARCHAR",  "not_null": false},
+    {"name": "program_name",       "type": "VARCHAR",  "not_null": false},
+    {"name": "program_element",    "type": "VARCHAR",  "not_null": false},
+    {"name": "pe_description",     "type": "VARCHAR",  "not_null": false},
+    {"name": "program_status",     "type": "VARCHAR",  "not_null": false},
+    {"name": "owner_id",           "type": "VARCHAR",  "not_null": false},
+    {"name": "owner_name",         "type": "VARCHAR",  "not_null": false},
+    {"name": "record_id",          "type": "VARCHAR",  "not_null": false},
+    {"name": "employee_id",        "type": "VARCHAR",  "not_null": false}
+  ]
+}
