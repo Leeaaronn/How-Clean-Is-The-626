@@ -1,0 +1,18 @@
+{
+  "table": "mart_near_me",
+  "path": "data/processed/mart_near_me.parquet",
+  "columns": [
+    {"name": "facility_key",     "type": "VARCHAR", "not_null": true},
+    {"name": "facility_name",    "type": "VARCHAR", "not_null": false},
+    {"name": "facility_address", "type": "VARCHAR", "not_null": false},
+    {"name": "facility_city",    "type": "VARCHAR", "not_null": false},
+    {"name": "facility_zip5",    "type": "VARCHAR", "not_null": false},
+    {"name": "cleanliness_index","type": "DOUBLE",  "not_null": true},
+    {"name": "low_data_flag",    "type": "BOOLEAN", "not_null": true},
+    {"name": "zip_lat",          "type": "DOUBLE",  "not_null": true},
+    {"name": "zip_lon",          "type": "DOUBLE",  "not_null": true},
+    {"name": "home_zip",         "type": "VARCHAR", "not_null": true},
+    {"name": "distance_miles",   "type": "DOUBLE",  "not_null": true},
+    {"name": "near_me_score",    "type": "DOUBLE",  "not_null": true}
+  ]
+}

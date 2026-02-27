@@ -94,6 +94,8 @@ def _quality_checks(con: duckdb.DuckDBPyConnection) -> list[str]:
         "fct_inspection":       (PROCESSED_DIR / "fct_inspection.parquet").as_posix(),
         "fct_violation":        (PROCESSED_DIR / "fct_violation.parquet").as_posix(),
         "mart_facility_health": (PROCESSED_DIR / "mart_facility_health.parquet").as_posix(),
+        "dim_zip_geo":          (PROCESSED_DIR / "dim_zip_geo.parquet").as_posix(),
+        "mart_near_me":         (PROCESSED_DIR / "mart_near_me.parquet").as_posix(),
     }
 
     def check(label: str, sql: str, expect_zero: bool = True) -> None:
@@ -168,6 +170,55 @@ def _quality_checks(con: duckdb.DuckDBPyConnection) -> list[str]:
         f"SELECT COUNT(*) FROM read_parquet('{stg_insp}') "
         f"WHERE facility_zip5 IS NULL OR length(facility_zip5) <> 5",
     )
+
+    # ------------------------------------------------------------------
+    # dim_zip_geo
+    # ------------------------------------------------------------------
+
+    # lat/lon plausible range for the 626 area (Southern California)
+    check(
+        "[dim_zip_geo] lat/lon outside Southern California range",
+        f"SELECT COUNT(*) FROM read_parquet('{p['dim_zip_geo']}') "
+        f"WHERE lat NOT BETWEEN 30 AND 40 OR lon NOT BETWEEN -125 AND -110",
+    )
+
+    # ------------------------------------------------------------------
+    # mart_near_me
+    # ------------------------------------------------------------------
+
+    # distance_miles non-negative
+    check(
+        "[mart_near_me] distance_miles < 0",
+        f"SELECT COUNT(*) FROM read_parquet('{p['mart_near_me']}') "
+        f"WHERE distance_miles < 0",
+    )
+
+    # near_me_score within [0, 100]
+    check(
+        "[mart_near_me] near_me_score out of range [0, 100]",
+        f"SELECT COUNT(*) FROM read_parquet('{p['mart_near_me']}') "
+        f"WHERE near_me_score < 0 OR near_me_score > 100",
+    )
+
+    # near_me_score <= cleanliness_index (proximity factor is always <= 1)
+    check(
+        "[mart_near_me] near_me_score > cleanliness_index",
+        f"SELECT COUNT(*) FROM read_parquet('{p['mart_near_me']}') "
+        f"WHERE near_me_score > cleanliness_index",
+    )
+
+    # row count must equal mart_facility_health (JOIN must not drop facilities)
+    near_me_rows = con.execute(
+        f"SELECT COUNT(*) FROM read_parquet('{p['mart_near_me']}')"
+    ).fetchone()[0]
+    health_rows = con.execute(
+        f"SELECT COUNT(*) FROM read_parquet('{p['mart_facility_health']}')"
+    ).fetchone()[0]
+    if near_me_rows != health_rows:
+        failures.append(
+            f"[mart_near_me] row count mismatch: "
+            f"mart_near_me={near_me_rows:,}, mart_facility_health={health_rows:,}"
+        )
 
     return failures
 
