@@ -1,0 +1,9 @@
+{
+  "table": "dim_zip_geo",
+  "path": "data/processed/dim_zip_geo.parquet",
+  "columns": [
+    {"name": "zip", "type": "VARCHAR", "not_null": true},
+    {"name": "lat", "type": "DOUBLE",  "not_null": true},
+    {"name": "lon", "type": "DOUBLE",  "not_null": true}
+  ]
+}

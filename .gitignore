@@ -3,3 +3,6 @@ data/processed/
 __pycache__/
 *.py[cod]
 .env
+tmp/
+db/seeds/zip_centroids_missing_626.csv
+.claude/settings.local.json

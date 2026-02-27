@@ -20,6 +20,8 @@ FCT_INSPECTION = (PROCESSED / "fct_inspection.parquet").as_posix()
 FCT_VIOLATION = (PROCESSED / "fct_violation.parquet").as_posix()
 MART_FACILITY_HEALTH = (PROCESSED / "mart_facility_health.parquet").as_posix()
 CORE_META = PROCESSED / "core_meta.json"
+DIM_ZIP_GEO  = (PROCESSED / "dim_zip_geo.parquet").as_posix()
+MART_NEAR_ME = (PROCESSED / "mart_near_me.parquet").as_posix()
 
 
 @pytest.fixture(scope="session")
@@ -120,4 +122,63 @@ def test_merge_rate_lt_5pct(core_meta):
     assert rate < 0.05, (
         f"facility merge_rate={rate:.4f} >= 0.05; "
         f"more IDs are merging than expected"
+    )
+
+
+# ---------------------------------------------------------------------------
+# dim_zip_geo
+# ---------------------------------------------------------------------------
+
+def test_dim_zip_geo_lat_lon_range(con):
+    bad = con.execute(
+        f"SELECT COUNT(*) FROM read_parquet('{DIM_ZIP_GEO}') "
+        f"WHERE lat NOT BETWEEN 30 AND 40 OR lon NOT BETWEEN -125 AND -110"
+    ).fetchone()[0]
+    assert bad == 0, (
+        f"{bad} dim_zip_geo rows have lat/lon outside Southern California range "
+        f"(lat 30–40, lon -125–-110)"
+    )
+
+
+# ---------------------------------------------------------------------------
+# mart_near_me
+# ---------------------------------------------------------------------------
+
+def test_near_me_distance_non_negative(con):
+    bad = con.execute(
+        f"SELECT COUNT(*) FROM read_parquet('{MART_NEAR_ME}') "
+        f"WHERE distance_miles < 0"
+    ).fetchone()[0]
+    assert bad == 0, f"{bad} rows have distance_miles < 0"
+
+
+def test_near_me_score_in_range(con):
+    bad = con.execute(
+        f"SELECT COUNT(*) FROM read_parquet('{MART_NEAR_ME}') "
+        f"WHERE near_me_score < 0 OR near_me_score > 100"
+    ).fetchone()[0]
+    assert bad == 0, f"{bad} rows have near_me_score outside [0, 100]"
+
+
+def test_near_me_score_le_cleanliness_index(con):
+    bad = con.execute(
+        f"SELECT COUNT(*) FROM read_parquet('{MART_NEAR_ME}') "
+        f"WHERE near_me_score > cleanliness_index"
+    ).fetchone()[0]
+    assert bad == 0, (
+        f"{bad} rows have near_me_score > cleanliness_index "
+        f"(proximity factor must be <= 1)"
+    )
+
+
+def test_near_me_rowcount_equals_mart_facility_health(con):
+    near_me_rows = con.execute(
+        f"SELECT COUNT(*) FROM read_parquet('{MART_NEAR_ME}')"
+    ).fetchone()[0]
+    health_rows = con.execute(
+        f"SELECT COUNT(*) FROM read_parquet('{MART_FACILITY_HEALTH}')"
+    ).fetchone()[0]
+    assert near_me_rows == health_rows, (
+        f"mart_near_me has {near_me_rows:,} rows but mart_facility_health has "
+        f"{health_rows:,}; ZIP join must not drop facilities"
     )
