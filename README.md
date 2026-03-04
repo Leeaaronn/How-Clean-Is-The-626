@@ -1,7 +1,6 @@
 # How Clean Is The 626?
 
-[![CI](https://github.com/Leeaaronn/How-Clean-Is-The-626/actions/workflows/ci.yml/badge.svg)](https://github.com/Leeaaronn/How-Clean-Is-The-626/actions/workflows/ci.yml)
-
+[![CI](https://github.com/Leeaaronn/How-Clean-Is-The-626/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Leeaaronn/How-Clean-Is-The-626/actions/workflows/ci.yml)
 A production-style analytics engineering project that builds a reproducible data pipeline and cleanliness scoring model for restaurants across the San Gabriel Valley (626 area code) using LA County public health inspection data.
 
 I built this because I eat at these restaurants every week and wanted to know which ones are actually clean — and which are repeat offenders.
