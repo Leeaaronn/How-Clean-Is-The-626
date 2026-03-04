@@ -1,0 +1,6 @@
+duckdb
+pandas
+pydeck
+streamlit
+pytest
+ruff
