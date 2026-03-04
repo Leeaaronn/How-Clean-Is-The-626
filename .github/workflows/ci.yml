@@ -38,6 +38,7 @@ jobs:
           make stage
           make core
           make marts
+          make geo_near_me
 
       - name: Validate
         shell: bash
