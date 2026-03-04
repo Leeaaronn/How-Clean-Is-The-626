@@ -54,7 +54,10 @@ def main() -> None:
 
     # ---------- mart_facility_health ----------
     # Reference date = max activity_date in dataset (reproducible).
-    # Window: 12 months if >=2 inspections, else 24 months.
+    # Scoring window: always 12 months (ref_date - 365 days).
+    # Facilities with no inspections in the trailing 12 months are excluded
+    # from the mart entirely.  inspections_24mo is retained as an informational
+    # column only; it is NOT used in any denominator.
     # Cleanliness index:
     #   ScoreTrend    = weighted-avg score (0-90d:1.0, 91-180d:0.8, 181-365d:0.6, 366-730d:0.3)
     #   ViolationScore = 100 - 12*(viol/insp) - 8*(pts/insp), clamp 0..100
@@ -67,7 +70,7 @@ def main() -> None:
             SELECT MAX(activity_date) AS ref_date
             FROM read_parquet('{fct_insp}')
         ),
-        -- Per-facility inspection counts in 12mo and 24mo to pick window
+        -- Per-facility inspection counts: 12mo used for scoring, 24mo informational
         window_sel AS (
             SELECT
                 i.facility_key,
@@ -78,13 +81,7 @@ def main() -> None:
                 COUNT(*) FILTER (
                     WHERE i.activity_date >= r.ref_date - INTERVAL '730 days'
                 )                                                           AS insp_24mo,
-                CASE
-                    WHEN COUNT(*) FILTER (
-                        WHERE i.activity_date >= r.ref_date - INTERVAL '365 days'
-                    ) >= 2
-                    THEN (r.ref_date - INTERVAL '365 days')::DATE
-                    ELSE (r.ref_date - INTERVAL '730 days')::DATE
-                END                                                         AS window_start
+                (r.ref_date - INTERVAL '365 days')::DATE                   AS window_start
             FROM read_parquet('{fct_insp}') i
             CROSS JOIN ref r
             GROUP BY i.facility_key, r.ref_date
@@ -129,7 +126,6 @@ def main() -> None:
                 any_value(iw.ref_date)                                      AS ref_date,
                 any_value(iw.insp_12mo)                                     AS insp_12mo,
                 any_value(iw.insp_24mo)                                     AS insp_24mo,
-                COUNT(*)                                                    AS insp_in_window,
                 SUM(iw.score * iw.recency_weight)
                     / NULLIF(SUM(iw.recency_weight), 0)                     AS score_trend,
                 SUM(iw.is_bad_event)                                        AS bad_event_count,
@@ -147,26 +143,25 @@ def main() -> None:
                 fm.ref_date,
                 fm.insp_12mo,
                 fm.insp_24mo,
-                fm.insp_in_window,
                 fm.score_trend,
                 fm.bad_event_count,
                 fm.latest_activity_date,
                 fm.latest_score,
                 fm.latest_grade,
                 fm.facility_zip5,
-                COALESCE(vw.violation_count, 0)::DOUBLE                     AS violation_count,
-                COALESCE(vw.total_points, 0.0)                              AS total_points,
-                COALESCE(vw.violation_count, 0)::DOUBLE / fm.insp_in_window AS violations_per_inspection,
-                COALESCE(vw.total_points, 0.0)        / fm.insp_in_window   AS points_per_inspection,
+                COALESCE(vw.violation_count, 0)::DOUBLE                    AS violation_count,
+                COALESCE(vw.total_points, 0.0)                             AS total_points,
+                COALESCE(vw.violation_count, 0)::DOUBLE / fm.insp_12mo    AS violations_per_inspection,
+                COALESCE(vw.total_points, 0.0)        / fm.insp_12mo      AS points_per_inspection,
                 GREATEST(0.0, LEAST(100.0,
                     100.0
-                    - 12.0 * (COALESCE(vw.violation_count, 0)::DOUBLE / fm.insp_in_window)
-                    - 8.0  * (COALESCE(vw.total_points,   0.0)        / fm.insp_in_window)
-                ))                                                          AS violation_score,
+                    - 12.0 * (COALESCE(vw.violation_count, 0)::DOUBLE / fm.insp_12mo)
+                    - 8.0  * (COALESCE(vw.total_points,   0.0)        / fm.insp_12mo)
+                ))                                                         AS violation_score,
                 GREATEST(0.0, LEAST(100.0,
                     100.0 - 15.0 * fm.bad_event_count
-                ))                                                          AS event_score,
-                fm.insp_24mo < 2                                            AS low_data_flag
+                ))                                                         AS event_score,
+                fm.insp_12mo < 2                                           AS low_data_flag
             FROM fac_metrics fm
             LEFT JOIN viol_w vw ON fm.facility_key = vw.facility_key
         )
@@ -184,7 +179,6 @@ def main() -> None:
             sc.latest_grade,
             sc.insp_12mo                AS inspections_12mo,
             sc.insp_24mo                AS inspections_24mo,
-            sc.insp_in_window           AS inspections_in_window,
             sc.bad_event_count,
             sc.violation_count,
             sc.total_points,
