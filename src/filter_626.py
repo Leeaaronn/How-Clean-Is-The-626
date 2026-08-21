@@ -65,6 +65,25 @@ def _count_rows_csv_fast(path: Path) -> int:
     return max(0, n - 1)
 
 
+def _ensure_utf8(src: Path) -> Path:
+    """Return a UTF-8 encoded copy of src if it contains non-UTF-8 bytes.
+
+    Reads raw bytes decoded as latin-1 (lossless for all byte values) and
+    re-encodes as UTF-8. The copy is placed alongside the original with a
+    '_utf8' suffix so the raw file is never mutated.
+    """
+    raw = src.read_bytes()
+    try:
+        raw.decode("utf-8")
+        return src  # already valid UTF-8, use as-is
+    except UnicodeDecodeError:
+        pass
+    out = src.with_stem(src.stem + "_utf8")
+    out.write_text(raw.decode("latin-1"), encoding="utf-8")
+    print(f"[encoding] re-encoded {src.name} → {out.name} (latin-1 → utf-8)", flush=True)
+    return out
+
+
 def main() -> None:
     _require_exists(INSPECTIONS_RAW)
     _require_exists(VIOLATIONS_RAW)
@@ -81,9 +100,9 @@ def main() -> None:
 
     con = duckdb.connect(database=":memory:")
 
-    # Read as VARCHAR to prevent conversion errors and make Phase 2 “subset + persist” stable.
+    # Read as VARCHAR to prevent conversion errors and make Phase 2 "subset + persist" stable.
     # We intentionally defer typing to Phase 3 (staging).
-    insp_path = INSPECTIONS_RAW.resolve().as_posix()
+    insp_path = _ensure_utf8(INSPECTIONS_RAW).resolve().as_posix()
     con.execute(
     f"""
     CREATE OR REPLACE VIEW inspections_raw AS
@@ -97,7 +116,7 @@ def main() -> None:
     """
 )
 
-    viol_path = VIOLATIONS_RAW.resolve().as_posix()
+    viol_path = _ensure_utf8(VIOLATIONS_RAW).resolve().as_posix()
     con.execute(
     f"""
     CREATE OR REPLACE VIEW violations_raw AS
